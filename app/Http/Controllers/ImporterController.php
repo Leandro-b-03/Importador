@@ -256,7 +256,10 @@ class ImporterController extends Controller
      */
     public function show($id)
     {
-        //
+        // Get all the files uploads and they status
+        $file = File::find($id);
+
+        return view('show')->with('file', $file);
     }
 
     /**

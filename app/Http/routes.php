@@ -12,5 +12,6 @@
 */
 
 Route::resource('/', 'ImporterController');
+Route::resource('file', 'ImporterController');
 Route::get('columns', 'ImporterController@columns');
 Route::post('columns/put', 'ImporterController@cposts');

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Importador SVLabs</title>
+        <title>Importador SVLabs - Colunas não cadastradas</title>
         <link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet" type="text/css">
         <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
@@ -15,6 +15,10 @@
         {{ Html::style('library/css/custom-css.css') }}
         <!-- Pace -->
         {{ Html::style('library/css/corner_indicator.css') }}
+        <!-- Select2 -->
+        {{ Html::style('library/js/select2-4.0.3/dist/css/select2.min.css') }}
+        <!-- Prism -->
+        {{ Html::style('library/css/prism.css') }}
     </head>
     <body>
         <!-- Navigation -->
@@ -45,63 +49,51 @@
             </div>
             <!-- /.container -->
         </nav>
-
         <!-- Page Content -->
         <div class="container">
-            <div class="box box-solid box-primary">
-                <div class="box-header with-border">
-                    <i class="fa fa-upload"></i>
-                    <h3 class="box-title">Importador de Planilhas</h3>
-                </div>
-                <!-- /.box-header -->
-                <div class="box-body">
-                    {{ Form::open(array('url' => '/', 'files' => true)) }}
-                        <div class="col-md-6 form-group">
-                            {{ Form::label('file', 'Arquivo para importação', array('class' => 'cols-sm-2 control-label')) }}
-                            <div class="cols-sm-10">
-                                <div class="input-group">
-                                    {{ Form::file("file", $attributes = array("class" => "form-control", )) }}
-                                    <span class="input-group-addon"><i class="fa fa-file-excel-o" aria-hidden="true"></i></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-12 pull-right">
-                            <button class="btn btn-primary pull-right">Enviar</button>
-                        </div>
-                    {{ Form::close() }}
-                </div>
-            <!-- /.box-body -->
-            </div>
             <div class="box box-solid">
                 <div class="box-header with-border">
                     <i class="fa fa-table"></i>
-                    <h3 class="box-title">Importador de Planilhas</h3>
+                    <h3 class="box-title">Query SQL</h3>
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">
-                    <table class="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th>Nome do Arquivo</th>
-                                <th>Importado corretamente</th>
-                                <th>Data de importação</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($files as $file)
-                            <tr>
-                                <td><a href="file/{{ $file->id }}">{{ $file->name }}</a></td>
-                                <td>{{ ($file->full_read ? 'Sim' : 'Não') }}</td>
-                                <td>{{ with($file->created_at)->format('d/m/Y H:i:s') }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <pre>
+                        <code class="language-sql">
+                            SET @sql = NULL;
+                            SELECT 
+                                GROUP_CONCAT(DISTINCT CONCAT('(case when ct.name = \'',
+                                            ct.name,
+                                            '\' then ct.value else null end) AS `',
+                                            ct.name,
+                                            '`'))
+                            INTO @sql FROM
+                                (SELECT 
+                                    cf.name, dcf.value
+                                FROM
+                                    ip_custom_fields cf
+                                LEFT JOIN ip_data_custom_fields dcf ON (dcf.custom_field_id = cf.id)) ct;
+
+                            SET @sql = CONCAT('SELECT dt.*, ', @sql, ' 
+                                              from ip_datas dt
+                                              left join ip_folders fd on (dt.folder_id = fd.id)
+                                              left join ip_data_custom_fields dcf ON (dt.id = dcf.data_id)
+                                              left join ip_custom_fields cf on (dcf.custom_field_id = cf.id)
+                                              left join (select dcf.data_id as data_id, cf.id as custom_field_id, cf.name as name, dcf.value as value
+                                              from ip_custom_fields cf
+                                              left join ip_data_custom_fields dcf on (dcf.custom_field_id = cf.id)) ct on (cf.id = ct.custom_field_id and dt.id = ct.data_id)
+                                              where fd.file_id = {{ $file->id }} group by dt.id');
+
+                            PREPARE stmt FROM @sql;
+                            EXECUTE stmt;
+                            DEALLOCATE PREPARE stmt;
+                        </code>
+                    </pre>
                 </div>
                 <!-- /.box-body -->
                 <div class="box-footer">
+                    <a href="{{ url('/') }}" class="btn btn-danger">Voltar</a>
                     <div class="pull-right">
-                        {{ $files->links() }}
                     </div>
                 </div>
             </div>
@@ -119,5 +111,13 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
         <!-- Pace -->
         {{ Html::script('library/js/pace.min.js') }}
+        <!-- Select2 -->
+        {{ Html::script('library/js/select2-4.0.3/dist/js/select2.min.js') }}
+        <!-- prims -->
+        {{ Html::script('library/js/prism.js') }}
+
+        <script type="text/javascript" charset="utf-8">
+            $('select').select2();
+        </script>
     </body>
 </html>

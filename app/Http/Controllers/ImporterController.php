@@ -50,13 +50,18 @@ class ImporterController extends Controller
      */
     public function store(Request $request)
     {
+        require_once base_path('vendor/box/spout/src/Spout/Reader/ReaderFactory.php');
+        require_once base_path('vendor/box/spout/src/Spout/Common/Type.php');
         $inputs = $request->all();
 
         try {
             if($inputs) {
-                ini_set('memory_limit','5512M');
-                ini_set('MAX_EXECUTION_TIME', -1);
                 set_time_limit(0);
+                ini_set('max_execution_time',-1);
+                ini_set('memory_limit', '-1'); 
+                // $cacheMethod = PHPExcel_CachedObjectStorageFactory:: cache_in_memory_gzip;
+                // $cacheSettings = array( ' memoryCacheSize ' => '-1');
+                // PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
 
                 $name = $inputs['file']->getClientOriginalName();
 
@@ -66,29 +71,63 @@ class ImporterController extends Controller
                 $this->columns = false;
 
                 if ($this->file) {
-                    Excel::load($inputs['file']->getRealPath(), function($reader) {
+                    $reader = \Box\Spout\Reader\ReaderFactory::create(\Box\Spout\Common\Type::XLSX);
+                    $reader->open($inputs['file']->getRealPath());
+
+                    foreach ($reader->getSheetIterator() as $sheet) {
+                        d($sheet);
+                    // Excel::load($inputs['file']->getRealPath(), function($reader) {
                         // Getting all results
-                        $results = $reader->get();
+                        // $results = $reader->get();
 
-                        foreach ($results as $sheet) {
-                            $folder = Folder::create( array('file_id' => $this->file->id, 'name' => $sheet->getTitle()) );
+                        // foreach ($results as $sheet) {
+                            $folder = Folder::create( array('file_id' => $this->file->id, 'name' => $sheet->getName()) );
+                            $keys = null;
 
-                            if ($sheet->getTitle() != 'IDENTIFICAÇÃO') {
+                            if ($sheet->getName() != 'IDENTIFICAÇÃO') {
                                 $grupo = '';
-                                foreach ($sheet as $row) {
-                                    if (!is_float($row->id)) {
-                                        if ($grupo != $row->id)
-                                            $grupo = $row->id;
+                                // foreach ($sheet as $row) {
+                                foreach ($sheet->getRowIterator() as $row) {
+                                    if (strtolower($row[0]) == 'id') {
+                                        foreach ($row as $value) {
+                                            $unwanted_array = array(    'Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A',
+                                                'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E', 'Ê'=>'E', 'Ë'=>'E',
+                                                'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O',
+                                                'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss',
+                                                'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c',
+                                                'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o',
+                                                'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y' );
+                                            $keys[] = str_replace(' ', '_', str_replace('-', '_', str_replace('/', '_', str_replace('\\', '_', strtolower(strtr( $value, $unwanted_array ))))));
+                                        }
+                                    } else if (!is_int($row[0])) {
+                                        if ($grupo != $row[0])
+                                            $grupo = $row[0];
                                     } else {
-                                        $_row = $row->toArray();
+                                        $_row = array();
+                                        $row_count = count($row);
+
+                                        for ($i = 0; $i < $row_count; $i++) {
+                                            if ($keys[$i] != '')
+                                                $_row[$keys[$i]] = $row[$i];
+                                        }
+                                        
                                         $_row['folder_id'] = $folder->id;
-                                        $_row['posicao'] = intval($row->id);
+                                        $_row['posicao'] = intval($row[0]);
                                         $_row['grupo'] = $grupo;
 
                                         $columns = array();
                                         $custom_fields = array();
 
+                                        if ($sheet->getName() == '23.TRIB') {
+                                            d($row);
+                                            d($row_count);
+                                            d($keys);
+                                            d($_row);
+                                            die();
+                                        }
+
                                         foreach ($_row as $key => $value) {
+                                            gc_collect_cycles();
                                             $vocabulary = Vocabulary::where('name', $key)->get()->first();
                                             if (!$vocabulary) {
                                                 $term = Term::where('name', $key)->get()->first();
@@ -106,7 +145,7 @@ class ImporterController extends Controller
                                                     } else {
                                                         $columns[] = array(
                                                             'folder_id' => $folder->id,
-                                                            'posicao' => intval($row->id),
+                                                            'posicao' => intval($row[0]),
                                                             'column' => $key,
                                                             'value' => (is_object($value) ? $value->toDateTimeString() :  $value)
                                                         );
@@ -138,7 +177,7 @@ class ImporterController extends Controller
                                 }
                             }
                         }
-                    });
+                    //});
                 } else {
                     Log::error('Error trying to save the file');
                     return redirect('/');

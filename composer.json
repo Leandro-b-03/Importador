@@ -16,7 +16,8 @@
         "illuminate/pagination": "^5.2",
         "illuminate/contracts": "^5.2",
         "illuminate/queue": "^5.2",
-        "devfactory/taxonomy": "^3.1"
+        "devfactory/taxonomy": "^3.1",
+        "box/spout": "^2.4"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

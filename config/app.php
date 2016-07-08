@@ -163,6 +163,7 @@ return [
         Collective\Html\HtmlServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Devfactory\Taxonomy\TaxonomyServiceProvider::class,
+        // Box\Spout\SpoutServiceProvider::class,
 
     ],
 

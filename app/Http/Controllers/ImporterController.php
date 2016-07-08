@@ -75,7 +75,6 @@ class ImporterController extends Controller
                     $reader->open($inputs['file']->getRealPath());
 
                     foreach ($reader->getSheetIterator() as $sheet) {
-                        d($sheet);
                     // Excel::load($inputs['file']->getRealPath(), function($reader) {
                         // Getting all results
                         // $results = $reader->get();
@@ -107,7 +106,7 @@ class ImporterController extends Controller
                                         $row_count = count($row);
 
                                         for ($i = 0; $i < $row_count; $i++) {
-                                            if ($keys[$i] != '')
+                                            if (isset($keys[$i]) && $keys[$i] != '')
                                                 $_row[$keys[$i]] = $row[$i];
                                         }
                                         
@@ -117,14 +116,6 @@ class ImporterController extends Controller
 
                                         $columns = array();
                                         $custom_fields = array();
-
-                                        if ($sheet->getName() == '23.TRIB') {
-                                            d($row);
-                                            d($row_count);
-                                            d($keys);
-                                            d($_row);
-                                            die();
-                                        }
 
                                         foreach ($_row as $key => $value) {
                                             gc_collect_cycles();

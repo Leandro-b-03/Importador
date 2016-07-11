@@ -103,6 +103,10 @@
 
         <script type="text/javascript" charset="utf-8">
             $('select').select2();
+
+            $('form').submit(function() {
+                $(this).find('button').prop('disabled',true);
+            })
         </script>
     </body>
 </html>

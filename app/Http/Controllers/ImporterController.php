@@ -83,7 +83,18 @@ class ImporterController extends Controller
                             $folder = Folder::create( array('file_id' => $this->file->id, 'name' => $sheet->getName()) );
                             $keys = null;
 
-                            if ($sheet->getName() != 'IDENTIFICAÇÃO') {
+                            if ($sheet->getName() == 'IDENTIFICAÇÃO') {
+                                foreach ($sheet->getRowIterator() as $row) {
+                                    if (is_string ($row[0])) {
+                                        d($row[0]);
+                                        if (strtolower($row[0]) == 'Projeto / Customizações') {
+                                            $this->file->project_id = $row[1];
+
+                                            die(d($this->file->save()));
+                                        }
+                                    }
+                                }
+                            } else {
                                 $grupo = '';
                                 // foreach ($sheet as $row) {
                                 foreach ($sheet->getRowIterator() as $row) {

@@ -9,16 +9,16 @@
     "packages": [
         {
             "name": "arcanedev/log-viewer",
-            "version": "3.10.0",
+            "version": "3.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ARCANEDEV/LogViewer.git",
-                "reference": "c7715b18d750c9feb4a4280137963f12ae655794"
+                "reference": "e00027530991254d0fbf60018709bd973a077124"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ARCANEDEV/LogViewer/zipball/c7715b18d750c9feb4a4280137963f12ae655794",
-                "reference": "c7715b18d750c9feb4a4280137963f12ae655794",
+                "url": "https://api.github.com/repos/ARCANEDEV/LogViewer/zipball/e00027530991254d0fbf60018709bd973a077124",
+                "reference": "e00027530991254d0fbf60018709bd973a077124",
                 "shasum": ""
             },
             "require": {
@@ -68,7 +68,7 @@
                 "log-viewer",
                 "logviewer"
             ],
-            "time": "2016-06-06 01:38:50"
+            "time": "2016-07-12 20:48:37"
         },
         {
             "name": "arcanedev/support",
@@ -131,16 +131,16 @@
         },
         {
             "name": "box/spout",
-            "version": "v2.4.4",
+            "version": "v2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/box/spout.git",
-                "reference": "e9cd7a397e91e4f6b624a37c3fb73ea605f08e90"
+                "reference": "a8eb7ad39cfd7ae92889a361f72e5090b5a9095b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/box/spout/zipball/e9cd7a397e91e4f6b624a37c3fb73ea605f08e90",
-                "reference": "e9cd7a397e91e4f6b624a37c3fb73ea605f08e90",
+                "url": "https://api.github.com/repos/box/spout/zipball/a8eb7ad39cfd7ae92889a361f72e5090b5a9095b",
+                "reference": "a8eb7ad39cfd7ae92889a361f72e5090b5a9095b",
                 "shasum": ""
             },
             "require": {
@@ -150,8 +150,7 @@
                 "php": ">=5.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": ">=3.7",
-                "scrutinizer/ocular": "~1.1"
+                "phpunit/phpunit": "^4.8.0"
             },
             "suggest": {
                 "ext-iconv": "To handle non UTF-8 CSV files (if \"php-intl\" is not already installed or is too limited)",
@@ -197,7 +196,7 @@
                 "write",
                 "xlsx"
             ],
-            "time": "2016-04-12 18:03:15"
+            "time": "2016-07-11 17:03:37"
         },
         {
             "name": "classpreloader/classpreloader",
@@ -1468,23 +1467,23 @@
         },
         {
             "name": "swiftmailer/swiftmailer",
-            "version": "v5.4.2",
+            "version": "v5.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swiftmailer/swiftmailer.git",
-                "reference": "d8db871a54619458a805229a057ea2af33c753e8"
+                "reference": "4cc92842069c2bbc1f28daaaf1d2576ec4dfe153"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/d8db871a54619458a805229a057ea2af33c753e8",
-                "reference": "d8db871a54619458a805229a057ea2af33c753e8",
+                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/4cc92842069c2bbc1f28daaaf1d2576ec4dfe153",
+                "reference": "4cc92842069c2bbc1f28daaaf1d2576ec4dfe153",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
             "require-dev": {
-                "mockery/mockery": "~0.9.1,<0.9.4"
+                "mockery/mockery": "~0.9.1"
             },
             "type": "library",
             "extra": {
@@ -1517,7 +1516,7 @@
                 "mail",
                 "mailer"
             ],
-            "time": "2016-05-01 08:45:47"
+            "time": "2016-07-08 11:51:25"
         },
         {
             "name": "symfony/console",

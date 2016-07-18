@@ -28,7 +28,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="/">Importador SVLabs</a>
+                    <a class="navbar-brand" href="/">Importador <strong>SVLabs</strong></a>
                 </div>
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -83,16 +83,20 @@
                         <thead>
                             <tr>
                                 <th>Nome do Arquivo</th>
+                                <th>Id do projeto</th>
                                 <th>Importado corretamente</th>
                                 <th>Data de importação</th>
+                                <th>Ação</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($files as $file)
                             <tr>
                                 <td><a href="file/{{ $file->id }}">{{ $file->name }}</a></td>
+                                <td>{{ $file->project_id }}</td>
                                 <td>{{ ($file->full_read ? 'Sim' : 'Não') }}</td>
                                 <td>{{ with($file->created_at)->format('d/m/Y H:i:s') }}</td>
+                                <td><a id="{{ $file->id }}" data-token="{{ csrf_token() }}" class="btn btn-xs btn-danger delete-file">Deletar</a></td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -109,7 +113,7 @@
         <!-- /.container -->
 
         <div class="footer">
-            <p class="pull-left">Copyright &copy; 2016 - SVLabs</p>
+            <p class="pull-left">Copyright &copy; {{ \Carbon\Carbon::now()->year }} - <strong>SVLabs</strong></p>
             <p class="pull-right">Todos os direitos reservados</p>
         </div>
 
@@ -122,7 +126,19 @@
         <script type="text/javascript">
             $('form').submit(function() {
                 $(this).find('button').prop('disabled',true);
-            })
+            });
+
+            $('.delete-file').click(function() {
+                var token = $(this).data('token');
+                $.ajax({
+                    url: 'file/' + $(this).attr('id'),
+                    type: 'post',
+                    data: {_method: 'delete', _token :token},
+                    success: function() {
+                        location.reload();
+                    }
+                });
+            });
         </script>
     </body>
 </html>

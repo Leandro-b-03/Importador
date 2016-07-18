@@ -86,11 +86,10 @@ class ImporterController extends Controller
                             if ($sheet->getName() == 'IDENTIFICAÇÃO') {
                                 foreach ($sheet->getRowIterator() as $row) {
                                     if (is_string ($row[0])) {
-                                        d($row[0]);
-                                        if (strtolower($row[0]) == 'Projeto / Customizações') {
+                                        if (str_replace(' ', '', strtolower($row[0])) == str_replace(' ', '', strtolower('Projeto / Customizações'))) {
                                             $this->file->project_id = $row[1];
 
-                                            die(d($this->file->save()));
+                                            $this->file->save();
                                         }
                                     }
                                 }
@@ -100,13 +99,14 @@ class ImporterController extends Controller
                                 foreach ($sheet->getRowIterator() as $row) {
                                     if (strtolower($row[0]) == 'id') {
                                         foreach ($row as $value) {
-                                            $unwanted_array = array(    'Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A',
+                                            $unwanted_array = array('Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A',
                                                 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E', 'Ê'=>'E', 'Ë'=>'E',
                                                 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O',
                                                 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss',
-                                                'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c',
-                                                'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o',
-                                                'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y' );
+                                                'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e',
+                                                'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n',
+                                                'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u',
+                                                'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y' );
                                             $keys[] = str_replace(' ', '_', str_replace('-', '_', str_replace('/', '_', str_replace('\\', '_', strtolower(strtr( $value, $unwanted_array ))))));
                                         }
                                     } else if (!is_int($row[0])) {
@@ -334,6 +334,8 @@ class ImporterController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $file = File::find($id);
+
+        $file->delete();
     }
 }
